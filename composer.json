@@ -13,12 +13,19 @@
     },
     "autoload": {
         "psr-4": {
-            "gipfl\\Protocol\\NetString": "src"
+            "gipfl\\Protocol\\NetString\\": "src"
         }
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/gipfl/Protocol",
+            "no-api":true
+        }
+    ],
     "require": {
         "php": ">=5.4.0",
         "ext-ctype": "*",
-       "gipfl/protocol": "*"
+        "gipfl/protocol": "*"
     }
 }

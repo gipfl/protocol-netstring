@@ -3,19 +3,23 @@
 namespace gipfl\Protocol\NetString;
 
 use gipfl\Protocol\Exception\ProtocolError;
-use gipfl\Protocol\Generic\AbstractStreamingDecoder;
-use React\Stream\ReadableStreamInterface;
+use gipfl\Protocol\Generic\AbstractStreamWrapper;
 
-class StreamingDecoder extends AbstractStreamingDecoder
+class StreamWrapper extends AbstractStreamWrapper
 {
     protected $buffer = '';
     protected $bufferLength = 0;
     protected $bufferOffset = 0;
     protected $expectedLength;
 
-    public function __construct(ReadableStreamInterface $input)
+    public function close()
     {
-        $this->readFrom($input);
+        // We might want to complain when buffer is not empty
+        $this->buffer = '';
+        $this->bufferLength = 0;
+        $this->bufferOffset = 0;
+        $this->expectedLength = null;
+        parent::close();
     }
 
     /**
@@ -36,6 +40,20 @@ class StreamingDecoder extends AbstractStreamingDecoder
         }
     }
 
+    public function write($data)
+    {
+        return $this->output->write(strlen($data) . ':' . $data . ',');
+    }
+
+    public function end($data = null)
+    {
+        if ($data !== null) {
+            $this->write($data);
+        }
+
+        $this->output->end();
+    }
+
     /**
      * @return bool
      */
@@ -48,7 +66,7 @@ class StreamingDecoder extends AbstractStreamingDecoder
                     $this->emit('error', [
                         new ProtocolError("Invalid length $lengthString")
                     ]);
-                    $this->removeAllListeners();
+                    $this->close();
 
                     return false;
                 }
@@ -56,6 +74,8 @@ class StreamingDecoder extends AbstractStreamingDecoder
                 $this->bufferOffset = $pos + 1;
             } elseif ($this->bufferLength > ($this->bufferOffset + 10)) {
                 $this->throwInvalidBuffer();
+                $this->close();
+
                 return false;
             } else {
                 return false;

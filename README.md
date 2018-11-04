@@ -1,4 +1,4 @@
-gipfl\\NetString
-================
+gipfl\\Protocol\\NetString
+==========================
 
 NetString implementation.

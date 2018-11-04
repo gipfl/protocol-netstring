@@ -2,6 +2,7 @@
     "name": "gipfl/protocol-netstring",
     "description": "Simple NetString stream wrapper",
     "type": "library",
+    "license": "MIT",
     "authors": [
         {
             "name": "Thomas Gelf",

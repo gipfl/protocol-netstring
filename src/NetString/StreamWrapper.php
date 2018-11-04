@@ -2,22 +2,26 @@
 
 namespace gipfl\Protocol\NetString;
 
-use Evenement\EventEmitterTrait;
 use gipfl\Protocol\Exception\ProtocolError;
+use gipfl\Protocol\Generic\AbstractStreamingDecoder;
+use React\Stream\ReadableStreamInterface;
 
-class NetStringParser
+class StreamingDecoder extends AbstractStreamingDecoder
 {
-    use EventEmitterTrait;
-
     protected $buffer = '';
     protected $bufferLength = 0;
     protected $bufferOffset = 0;
     protected $expectedLength;
 
+    public function __construct(ReadableStreamInterface $input)
+    {
+        $this->readFrom($input);
+    }
+
     /**
      * @param $data
      */
-    public function feed($data)
+    public function handleData($data)
     {
         $this->buffer .= $data;
         $this->bufferLength += \strlen($data);
@@ -68,9 +72,9 @@ class NetStringParser
         $this->bufferOffset = $this->bufferOffset + $this->expectedLength;
         $this->expectedLength = null;
 
-        $this->emit('packet', [$packet]);
+        $this->emit('data', [$packet]);
     }
-    
+
     protected function throwInvalidBuffer()
     {
         $len = \strlen($this->buffer);
@@ -83,10 +87,7 @@ class NetStringParser
         }
 
         $this->emit('error', [
-            new ProtocolError(
-                'Got invalid NetString data: %s',
-                $debug
-            )
+            new ProtocolError("Got invalid NetString data: $debug")
         ]);
     }
 }

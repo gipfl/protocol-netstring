@@ -17,16 +17,9 @@
             "gipfl\\Protocol\\NetString\\": "src"
         }
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/gipfl/Protocol",
-            "no-api":true
-        }
-    ],
     "require": {
         "php": ">=5.4.0",
         "ext-ctype": "*",
-        "gipfl/protocol": "dev-master"
+        "gipfl/protocol": "^0.1.0"
     }
 }
